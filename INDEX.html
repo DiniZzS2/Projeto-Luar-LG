@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estocagem de Alimentos</title>
+    <link rel="stylesheet" href="CSS/Style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="material-icons">restaurant</i>
+                    <h1>Estocagem de alimentos</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-card">
+                        <i class="fa-solid fa-utensils"></i>
+                        <div>
+                            <span class="stat-label">Total de Alimentos</span>
+                            <span class="stat-value" id="totalAlim">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <span class="stat-label">Estoque Baixo</span>
+                            <span class="stat-value alert" id="lowStock">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-btn active" data-section="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-btn" data-section="register">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Cadastrar alimento</span>
+                    </button>
+                    <button class="nav-btn" data-section="movement">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Movimentação</span>
+                    </button>
+                    <button class="nav-btn" data-section="history">
+                        <i class="fas fa-history"></i>
+                        <span>Histórico</span>
+                    </button>
+                 <!-- ADICIONE ESTES 3 BOTÕES AQUI -->
+                    <button class="nav-btn" onclick="exportarDados()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button class="nav-btn" onclick="importarDados()">
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                    <button class="nav-btn" onclick="gerarRelatorioEstoqueBaixo()">
+                        <i class="fas fa-file-download"></i> Relatório
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-line"></i> Dashboard de Alimentos</h2>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchAlim" placeholder="Buscar Alimento...">
+                        </div>
+                    </div>
+
+                    <div class="epis-grid" id="episGrid">
+                        <!-- EPIs will be loaded here -->
+                    </div>
+
+                    <div class="empty-state" id="emptyState">
+                        <i class="fas fa-inbox"></i>
+                        <h3>Nenhum alimento cadastrado</h3>
+                        <p>Comece adicionando alimentos ao sistema</p>
+                        <button class="btn btn-primary" onclick="switchSection('register')">
+                            <i class="fas fa-plus"></i> Cadastrar Primeiro alimento
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Register Section -->
+                <section id="register" class="section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-plus-circle"></i> Cadastrar Novo alimento</h2>
+                    </div>
+
+                    <form id="registerForm" class="form-card">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="epiName">
+                                    <i class="fas fa-tag"></i> Nome do alimento *
+                                </label>
+                                <input type="text" id="epiName" required placeholder="Ex: Capacete de Segurança">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="epiCategory">
+                                    <i class="fas fa-folder"></i> Categoria *
+                                </label>
+                                <select id="epiCategory" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Hortifruti">Hortifruti</option>
+                                    <option value="Laticínios">Laticínios</option>
+                                    <option value="Carnes">Carnes</option>
+                                    <option value="Grãos">Grãos</option>
+                                    <option value="Congelados">Congelados</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="epiCode">
+                                    <i class="fas fa-barcode"></i> Lote
+                                </label>
+                                <input type="text" id="epiCode" placeholder="Ex: Lote - 01">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="epiQuantity">
+                                    <i class="fas fa-boxes"></i> Quantidade Inicial *
+                                </label>
+                                <input type="number" id="epiQuantity" min="0" required placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="epiMinStock">
+                                    <i class="fas fa-exclamation-triangle"></i> Estoque Mínimo *
+                                </label>
+                                <input type="number" id="epiMinStock" min="0" required placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="epiLocation">
+                                    <i class="fas fa-map-marker-alt"></i> Localização
+                                </label>
+                                <input type="text" id="epiLocation" placeholder="Ex: Prateleira 3">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="epiDescription">
+                                <i class="fas fa-align-left"></i> Validade
+                            </label>
+                            <textarea id="epiDescription" rows="3" placeholder="Adicione a validade dos alimentos..."></textarea>
+                        </div>
+                    </br>
+                </br>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Cadastrar alimento
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Movement Section -->
+                <section id="movement" class="section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-exchange-alt"></i> Movimentação de Estoque</h2>
+                    </div>
+
+                    <form id="movementForm" class="form-card">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="movementEpi">
+                                    <i class="fas fa-hard-hat"></i> Selecione o alimento *
+                                </label>
+                                <select id="movementEpi" required>
+                                    <option value="">Selecione um alimento...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="movementType">
+                                    <i class="fas fa-arrow-right"></i> Tipo de Movimentação *
+                                </label>
+                                <select id="movementType" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="entrada">Entrada</option>
+                                    <option value="saida">Saída</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="movementQuantity">
+                                    <i class="fas fa-boxes"></i> Quantidade *
+                                </label>
+                                <input type="number" id="movementQuantity" min="1" required placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="movementResponsible">
+                                    <i class="fas fa-user"></i> Responsável *
+                                </label>
+                                <input type="text" id="movementResponsible" required placeholder="Nome do responsável">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="movementReason">
+                                <i class="fas fa-comment"></i> Motivo/Observação
+                            </label>
+                            <textarea id="movementReason" rows="3" placeholder="Descreva o motivo da movimentação..."></textarea>
+                        </div>
+
+                        <div class="current-stock-info" id="currentStockInfo" style="display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Estoque atual: <strong id="currentStockValue">0</strong> unidades</span>
+                        </div>
+
+                        </br>
+                        </br>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Registrar Movimentação
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- History Section -->
+                <section id="history" class="section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Histórico de Movimentações</h2>
+                        <div class="filter-group">
+                            <select id="filterType" class="filter-select">
+                                <option value="all">Todos os Tipos</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="saida">Saídas</option>
+                            </select>
+                            <select id="filterEpi" class="filter-select">
+                                <option value="all">Todos os alimentos</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="history-table-container">
+                        <table class="history-table" id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Alimento</th>
+                                    <th>Tipo</th>
+                                    <th>Quantidade</th>
+                                    <th>Responsável</th>
+                                    <th>Motivo</th>
+                                    <th>Estoque Após</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- History will be loaded here -->
+                            </tbody>
+                        </table>
+                        <div class="empty-state" id="emptyHistory">
+                            <i class="fas fa-history"></i>
+                            <h3>Nenhuma movimentação registrada</h3>
+                            <p>O histórico aparecerá aqui após as movimentações</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Edit/Delete -->
+    <div id="epiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Editar alimento</h3>
+                <button class="close-modal" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editEpiId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editEpiName">Nome do alimento *</label>
+                        <input type="text" id="editEpiName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEpiCategory">Categoria *</label>
+                        <select id="editEpiCategory" required>
+                            <option value="">Selecione...</option>
+                                <option value="Hortifruti">Hortifruti</option>
+                                <option value="Laticínios">Laticínios</option>
+                                <option value="Carnes">Carnes</option>
+                                <option value="Grãos">Grãos</option>
+                                <option value="Congelados">Congelados</option>
+                                <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEpiCode">Lote</label>
+                        <input type="text" id="editEpiCode">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEpiMinStock">Estoque Mínimo *</label>
+                        <input type="number" id="editEpiMinStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEpiLocation">Localização</label>
+                        <input type="text" id="editEpiLocation">
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="editEpiDescription">Descrição</label>
+                    <textarea id="editEpiDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar alterações
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteEpi()">
+                        <i class="fas fa-trash"></i> Excluir alimento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="JS/script.js"></script>
+</body>
+</html>
