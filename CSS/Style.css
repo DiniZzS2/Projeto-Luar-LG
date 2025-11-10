@@ -27,6 +27,92 @@ body {
     min-height: 100vh;
 }
 
+/* --- Estilização do Calendário (Flatpickr) --- */
+.flatpickr-calendar {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
+    box-shadow: var(--shadow);
+    color: var(--text-primary);
+}
+
+/* Cabeçalho do mês (Setas e nome do mês) */
+.flatpickr-months {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+.flatpickr-current-month input.cur-year {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+    fill: var(--primary-color);
+    width: 16px;
+    height: 16px;
+}
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+    fill: var(--primary-light);
+}
+
+/* Dias da semana (Seg, Ter, Qua...) */
+.flatpickr-weekdaycontainer {
+    padding: 0 1rem;
+}
+span.flatpickr-weekday {
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* Dias (Números) */
+.flatpickr-day {
+    color: var(--text-primary);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+.flatpickr-day:hover {
+    background: #e6f2e7; /* Fundo do seu input:focus */
+    border-color: transparent;
+    color: var(--text-primary);
+}
+.flatpickr-day.today {
+    border-color: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Dias de outro mês (mais claros) */
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    color: var(--border-color);
+}
+
+/* Quando se seleciona um período (Start/End) */
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+.flatpickr-day.inRange {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
 .container {
     display: flex;
     flex-direction: column;

@@ -76,15 +76,12 @@ const db = new EPIDatabase();
 
 // Category icons mapping
 const categoryIcons = {
-    'Proteção para Cabeça': 'fa-hard-hat',
-    'Proteção Respiratória': 'fa-head-side-mask',
-    'Proteção Auditiva': 'fa-ear-listen',
-    'Proteção Visual': 'fa-glasses',
-    'Proteção para Mãos': 'fa-hand-back-fist',
-    'Proteção para Pés': 'fa-shoe-prints',
-    'Proteção Corporal': 'fa-vest',
-    'Proteção contra Quedas': 'fa-parachute-box',
-    'Outros': 'fa-shield-halved'
+    'Hortifruti': 'fa-solid fa-carrot',
+    'Laticínios': 'fa-solid fa-cow',
+    'Carnes': 'fa-solid fa-drumstick-bite',
+    'Grãos': 'fa-solid fa-bread-slice',
+    'Congelados': 'fa-solid fa-snowflake',
+    'Outros': 'fa-solid fa-layer-group'
 };
 
 
@@ -153,7 +150,7 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
         });
     }
 
-    showToast('EPI cadastrado com sucesso!', 'success');
+    showToast('Alimento cadastrado com sucesso!', 'success');
     e.target.reset();
     updateStats();
 });
@@ -172,7 +169,7 @@ document.getElementById('movementForm').addEventListener('submit', (e) => {
     const epi = db.getEPI(epiId);
 
     if (!epi) {
-        showToast('EPI não encontrado!', 'error');
+        showToast('Alimento não encontrado!', 'error');
         return;
     }
 
@@ -230,7 +227,7 @@ document.getElementById('movementEpi').addEventListener('change', (e) => {
 // Populate movement select
 function populateMovementSelect() {
     const select = document.getElementById('movementEpi');
-    select.innerHTML = '<option value="">Selecione um EPI...</option>';
+    select.innerHTML = '<option value="">Selecione um alimento...</option>';
 
     db.getAllEPIs().forEach(epi => {
         const option = document.createElement('option');
