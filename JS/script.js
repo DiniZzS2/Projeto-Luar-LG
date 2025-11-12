@@ -73,6 +73,15 @@ class EPIDatabase {
 // Initialize database
 const db = new EPIDatabase();
 
+// Configuração do Flatpickr
+const flatpickrConfig = {
+    enableTime: false,
+    dateFormat: "Y-m-d", // Formato AAAA-MM-DD
+    altInput: true,      // Mostra um formato amigável para o usuário
+    altFormat: "d/m/Y",  // Formato DD/MM/AAAA
+    locale: "pt"
+};
+
 
 // Category icons mapping
 const categoryIcons = {
@@ -116,7 +125,10 @@ function switchSection(sectionName) {
 // Nav button event listeners
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        switchSection(btn.dataset.section);
+        // Verifica se o botão tem 'data-section', senão ignora (para botões de exportar, etc.)
+        if (btn.dataset.section) {
+            switchSection(btn.dataset.section);
+        }
     });
 });
 
@@ -132,6 +144,7 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
         quantity: parseInt(document.getElementById('epiQuantity').value),
         minStock: parseInt(document.getElementById('epiMinStock').value),
         location: document.getElementById('epiLocation').value || 'Não especificado',
+        validade: document.getElementById('epiValidade').value || '', // Campo de validade
         description: document.getElementById('epiDescription').value || ''
     };
 
@@ -152,6 +165,7 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
 
     showToast('Alimento cadastrado com sucesso!', 'success');
     e.target.reset();
+    flatpickr("#epiValidade", flatpickrConfig).clear(); // Limpa o calendário
     updateStats();
 });
 
@@ -249,7 +263,7 @@ function renderEPIs(filter = '') {
         epis = epis.filter(epi =>
             epi.name.toLowerCase().includes(filter.toLowerCase()) ||
             epi.category.toLowerCase().includes(filter.toLowerCase()) ||
-            epi.code.toLowerCase().includes(filter.toLowerCase())
+            (epi.code && epi.code.toLowerCase().includes(filter.toLowerCase()))
         );
     }
 
@@ -266,7 +280,7 @@ function renderEPIs(filter = '') {
         const isLowStock = epi.quantity <= epi.minStock;
         const isCritical = epi.quantity === 0;
         const stockClass = isCritical ? 'critical' : (isLowStock ? 'low' : '');
-        const cardClass = isLowStock ? 'low-stock' : '';
+        const cardClass = isLowStock ? 'low-stock' : (isCritical ? 'critical-stock' : ''); // Adicionado critical-stock
 
         return `
             <div class="epi-card ${cardClass}">
@@ -285,7 +299,7 @@ function renderEPIs(filter = '') {
                     <span class="epi-category">${epi.category}</span>
                     <div class="epi-details">
                         <div class="epi-detail">
-                            <span class="epi-detail-label">Código:</span>
+                            <span class="epi-detail-label">Lote:</span>
                             <span class="epi-detail-value">${epi.code}</span>
                         </div>
                         <div class="epi-detail">
@@ -301,6 +315,10 @@ function renderEPIs(filter = '') {
                         <div class="epi-detail">
                             <span class="epi-detail-label">Localização:</span>
                             <span class="epi-detail-value">${epi.location}</span>
+                        </div>
+                        <div class="epi-detail">
+                            <span class="epi-detail-label">Validade:</span>
+                            <span class="epi-detail-value">${epi.validade || 'N/A'}</span>
                         </div>
                     </div>
                     ${epi.description ? `<p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">${epi.description}</p>` : ''}
@@ -328,6 +346,7 @@ function openEditModal(epiId) {
     document.getElementById('editEpiCode').value = epi.code;
     document.getElementById('editEpiMinStock').value = epi.minStock;
     document.getElementById('editEpiLocation').value = epi.location;
+    document.getElementById('editEpiValidade').value = epi.validade || ''; // Campo de validade
     document.getElementById('editEpiDescription').value = epi.description;
 
     document.getElementById('epiModal').classList.add('active');
@@ -349,11 +368,12 @@ document.getElementById('editForm').addEventListener('submit', (e) => {
         code: document.getElementById('editEpiCode').value,
         minStock: parseInt(document.getElementById('editEpiMinStock').value),
         location: document.getElementById('editEpiLocation').value,
+        validade: document.getElementById('editEpiValidade').value || '', // Campo de validade
         description: document.getElementById('editEpiDescription').value
     };
 
     db.updateEPI(id, updates);
-    showToast('EPI atualizado com sucesso!', 'success');
+    showToast('Alimento atualizado com sucesso!', 'success');
     closeModal();
     renderEPIs();
     updateStats();
@@ -362,13 +382,13 @@ document.getElementById('editForm').addEventListener('submit', (e) => {
 
 // Delete EPI
 function deleteEpi() {
-    if (!confirm('Tem certeza que deseja excluir este EPI? Esta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja excluir este alimento? Esta ação não pode ser desfeita.')) {
         return;
     }
 
     const id = document.getElementById('editEpiId').value;
     db.deleteEPI(id);
-    showToast('EPI excluído com sucesso!', 'success');
+    showToast('Alimento excluído com sucesso!', 'success');
     closeModal();
     renderEPIs();
     updateStats();
@@ -489,7 +509,7 @@ function init() {
     renderHistory();
 }
 
-// Cole apenas as funções (sem a parte de adicionar botões)
+// Funções de Importar/Exportar
 function baixarArquivo(nomeArquivo, conteudo) {
     const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -570,13 +590,27 @@ function gerarRelatorioEstoqueBaixo() {
         relatorio += `   Localização: ${epi.location}\n\n`;
     });
     
-    relatorio += `Total: ${episBaixos.length} EPIs\n`;
+    relatorio += `Total: ${episBaixos.length} Alimentos\n`; // Corrigido de EPIs para Alimentos
     
     baixarArquivo(`relatorio-${new Date().toISOString().split('T')[0]}.txt`, relatorio);
     showToast(`📄 Relatório: ${episBaixos.length} itens`, 'success');
 }
 
 
+// [AQUI ESTÁ A MUDANÇA PRINCIPAL]
 // Run on load
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializa o app principal
+    init();
 
+    // Tenta inicializar os calendários
+    // Isso agora vai funcionar, pois o flatpickr.js carregou ANTES deste script.
+    try {
+        flatpickr("#epiValidade", flatpickrConfig);
+        flatpickr("#editEpiValidade", flatpickrConfig);
+    } catch (e) {
+        console.error("Erro ao inicializar o Flatpickr:", e);
+        // Opcional: Mostrar um alerta para o usuário se o calendário falhar
+        // alert("Não foi possível carregar o calendário. Verifique a conexão com a internet.");
+    }
+});
