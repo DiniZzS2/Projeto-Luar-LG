@@ -137,6 +137,7 @@ span.flatpickr-weekday {
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
+    
 }
 
 .logo {
@@ -145,7 +146,7 @@ span.flatpickr-weekday {
     gap: 1rem;
     color: var(--primary-color);
     font-weight: 700;
-    font-size: 1.8rem;
+    font-size: 1.0rem;
 }
 
 .header-stats {
